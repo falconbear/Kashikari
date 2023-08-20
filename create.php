@@ -1,5 +1,6 @@
 <?php
 
+session_start();
 // dbconnect.phpを読み込む ➞ DBに接続
 include_once('./dbconnect.php');
 
@@ -18,22 +19,38 @@ $amount = $_POST['amount'];
 $lender_id = $_POST['lender'];
 $borrower_id = $_POST['borrower'];
 
-// INSERT文の作成
-$sql = "INSERT INTO records(lender_id, borrower_id, title, amount, date, created_at, updated_at) VALUES(:lender_id, :borrower_id, :title, :amount, :date, now(), now())";
+if(empty($date) || empty($title) || empty($amount)) {
+  if(empty($date)) {
+    $_SESSION['flash']['date'] = '日付を入力してください';
+  }
+  
+  if(empty($title)) {
+    $_SESSION['flash']['title'] = '内容を入力してください';
+  }
+  
+  if(empty($amount)) {
+    $_SESSION['flash']['amount'] = '金額を入力してください';
+  }
+  header('Location: ./createForm.php');
+}
+else{
+  // INSERT文の作成
+  $sql = "INSERT INTO records(lender_id, borrower_id, title, amount, date, created_at, updated_at) VALUES(:lender_id, :borrower_id, :title, :amount, :date, now(), now())";
 
-// 先程作成したSQLを実行できるよう準備
-$stmt = $pdo->prepare($sql);
+  // 先程作成したSQLを実行できるよう準備
+  $stmt = $pdo->prepare($sql);
 
-// 値の設定
-$stmt->bindParam(':lender_id', $lender_id, PDO::PARAM_INT);
-$stmt->bindParam(':borrower_id', $borrower_id, PDO::PARAM_INT);
-$stmt->bindParam(':title', $title, PDO::PARAM_STR);
-$stmt->bindParam(':amount', $amount, PDO::PARAM_INT);
-$stmt->bindParam(':date', $date, PDO::PARAM_STR);
+  // 値の設定
+  $stmt->bindParam(':lender_id', $lender_id, PDO::PARAM_INT);
+  $stmt->bindParam(':borrower_id', $borrower_id, PDO::PARAM_INT);
+  $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+  $stmt->bindParam(':amount', $amount, PDO::PARAM_INT);
+  $stmt->bindParam(':date', $date, PDO::PARAM_STR);
 
-// SQLを実行
-$stmt->execute();
+  // SQLを実行
+  $stmt->execute();
 
-// index.phpに移動
-header('Location: ./index.php');
-exit;
+  // index.phpに移動
+  header('Location: ./index.php');
+  exit;
+}

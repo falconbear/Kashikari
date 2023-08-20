@@ -1,5 +1,6 @@
 <?php
 
+session_start();
 // DBへの接続
 include_once('./dbconnect.php');
 
@@ -23,6 +24,9 @@ $stmt->execute();
 
 // 全データを変数に入れる
 $users = $stmt->fetchAll();
+
+$flash = isset($_SESSION['flash']) ? $_SESSION['flash'] : [];
+unset($_SESSION['flash']);
 
 ?>
 
@@ -53,14 +57,17 @@ $users = $stmt->fetchAll();
       <div class="form-group">
         <label for="date">日付</label>
         <input type="date" class="form-control" id="date" name="date">
+        <?php echo isset($flash['date']) ? $flash['date'] : null ?>
       </div>
       <div class="form-group">
         <label for="title">タイトル</label>
         <input type="text" class="form-control" id="title" name="title">
+        <?php echo isset($flash['title']) ? $flash['title'] : null ?>
       </div>
       <div class="form-group">
         <label for="amount">金額</label>
         <input type="number" class="form-control" id="amount" name="amount">
+        <?php echo isset($flash['amount']) ? $flash['amount'] : null ?>
       </div>
       <div class="form-group">
         <label for="lender">貸した人</label>
